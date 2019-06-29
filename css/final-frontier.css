@@ -25,7 +25,7 @@ h1, h2, h3, h4 {
 
 .main-page > .cards > .card {
     min-height: 300px;
-    width: 300px;
+    width: 100%;
     padding: 10px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.8);
     background-color: white;
@@ -47,12 +47,14 @@ h1, h2, h3, h4 {
 }
 
 /* Card styling */
-#content {
+.content {
+    width: 100%;
+    height: 100%;
     padding: 10px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.8);
     border-radius: 10px;
 }
-#content.expanded {
+.content.expanded {
     position: relative;
     width: 95vw;
     height: 95vh;
@@ -103,6 +105,8 @@ h1, h2, h3, h4 {
 
 .gallery-content {
     display: flex;
+    width: 100%;
+    height: auto;
     justify-content: space-between;
     align-items: space-between;
 }
