@@ -50,7 +50,7 @@ h1, h2, h3, h4 {
 .card.expanded {
     position: absolute;
     width: 99vw;
-    height: 95vh;
+    height: 99vh;
     max-width: 100%;
     overflow: scroll;
     box-shadow: none;
@@ -74,11 +74,12 @@ h1, h2, h3, h4 {
 .article-content {
     display: inline-block;
     margin-bottom: 10px;
+    width: 100%;
     height: 250px;
     overflow: hidden;
 }
 .article-content.expanded {
-    overflow: inherit;
+    overflow: visible;
     width: 100%;
     height: 100%;
     margin-bottom: auto;
@@ -86,6 +87,11 @@ h1, h2, h3, h4 {
 
 .article-body {
     text-align: center;
+}
+.article-body > img {
+  max-width: 50%;
+  height: auto;
+  margin: 0 auto;
 }
 
 .read-more, .close {

@@ -43,7 +43,7 @@ function generateArticleCardHTML(cardData) {
         &times; Close
       </button>
       <h2 class="card-title">${cardData.title}</h2>
-      <p class="article-body">${cardData.body}</p>
+      <div class="article-body">${cardData.body}</div>
     </div>
     <div class="card-footer">
       <button class="read-more" id="read-more-article-${cardData.id}" data-article-id="article-${cardData.id}">

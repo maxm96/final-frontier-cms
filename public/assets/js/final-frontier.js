@@ -30,7 +30,7 @@ document.querySelectorAll('.read-more').forEach((btn) => {
         articleContent.classList.add('expanded')
         closeBtn.classList.remove('hide')
         btn.classList.add('hide')
-        card.classList.add('card')
+        card.classList.add('expanded')
     })
 })
 
