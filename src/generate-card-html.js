@@ -87,10 +87,10 @@ function generateVideoCardHTML(cardData) {
   return `
     <h2 class="card-title">${cardData.title}</h2>
     <div class="video-content">
-      <video controls width="150px">
+      <video controls>
         <source src="${cardData.source}" type="video/mp4">
       </video>
-      <p class="video-desc"></p>
+      <p class="video-desc">${cardData.description}</p>
     </div>
   `
 }
