@@ -19,14 +19,12 @@ module.exports = function requestHandler(req, res) {
     serveError(null, 501, 'Not Implemented', res)
     return
   }
-
-  console.log(req.url)
   
   if (req.url === '/') {
     // serve main page
     serveMain(req, res, (err) => serveError(err, 500, 'Server Error', res))
   } else {
-    // not main page -- get pathname and invoke stats
+    // not main page -- get pathname and invoke stat
     var pathname = url.parse(req.url).pathname
     var filePath = path.join('public', pathname)
     

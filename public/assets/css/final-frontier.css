@@ -48,13 +48,17 @@ h1, h2, h3, h4 {
     background-color: white;
 }
 .card.expanded {
-    position: relative;
-    width: 95vw;
+    position: absolute;
+    width: 99vw;
     height: 95vh;
     max-width: 100%;
     overflow: scroll;
     box-shadow: none;
     border-radius: none;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .card-title {
@@ -98,8 +102,6 @@ h1, h2, h3, h4 {
 
 .gallery-content {
     display: flex;
-    width: 100%;
-    height: auto;
     justify-content: space-between;
     align-items: space-between;
 }
@@ -134,10 +136,16 @@ h1, h2, h3, h4 {
 }
 
 .gallery-content > img:nth-child(1) {
-    display: initial;
+  display: initial;
+  width: 100%;
+  height: auto;
 }
 .gallery-content > img {
     display: none;
+}
+.gallery-content > img.expanded {
+  width: 100%;
+  height: auto;
 }
 
 .gallery-desc {

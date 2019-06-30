@@ -46,6 +46,7 @@ document.querySelectorAll('.close-gallery').forEach((btn) => {
         seeGalleryBtn.classList.remove('hide')
         btn.classList.add('hide')
         card.classList.remove('expanded')
+        document.querySelectorAll(`.${galleryId}-image`).forEach(img => img.classList.remove('expanded'))
     })
 })
 
@@ -60,5 +61,6 @@ document.querySelectorAll('.see-gallery').forEach((btn) => {
         closeGalleryBtn.classList.remove('hide')
         btn.classList.add('hide')
         card.classList.add('expanded')
+        document.querySelectorAll(`.${galleryId}-image`).forEach(img => img.classList.add('expanded'))
     })
 })

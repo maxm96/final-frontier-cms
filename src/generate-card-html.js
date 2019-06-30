@@ -66,7 +66,7 @@ function generateGalleryCardHTML(cardData) {
       </button>
       <h2 class="card-title">${cardData.title}</h2>
       <div class="gallery-content" id="gallery-${cardData.id}">
-        ${cardData.images.map((src, idx) => `<img src="${src}" alt="${idx}">`).join('')}
+        ${cardData.images.map((src, idx) => `<img src="${src}" alt="${idx}" class="gallery-${cardData.id}-image">`).join('')}
         <div class="gallery-desc">${cardData.description}</div>
       </div>
     </div>
