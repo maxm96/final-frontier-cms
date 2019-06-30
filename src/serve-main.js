@@ -17,8 +17,6 @@ module.exports = function serveMain(req, res, callback) {
     if (err)
       callback(err)
     
-    console.log(cards)
-    
     // generate html
     var html = generateMainHTML(JSON.parse(cards))
     
@@ -36,6 +34,16 @@ module.exports = function serveMain(req, res, callback) {
  * @param {array} cards - all card data
  */ 
 function generateMainHTML(cards) {
+  // map over cards, generating html blocks wrapped in a card div for each
+  var cardsHTML = cards.map((card) => {
+    return `
+      <div class="card ${card.type}">
+        ${generateCardHTML(card)}
+      </div>
+    `
+  }).join('')
+  
+  // return main html document with inserted card html
   return `
     <!DOCTYPE html>
     <html>
@@ -55,7 +63,7 @@ function generateMainHTML(cards) {
             </span>
           </div>
           <div class="cards">
-            ${cards.map(card => `<div class="card">${generateCardHTML(card)}</div>`).join('')}
+            ${cardsHTML}
           </div>
         </div>
         <script src="assets/js/final-frontier.js"></script>

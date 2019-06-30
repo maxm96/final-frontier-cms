@@ -36,10 +36,13 @@ module.exports = function requestHandler(req, res) {
         return serveError(err, 404, 'Not Found', res)
       
       if (stats.isFile()) { // serve file resource
-        serveFile(filePath, res, (err) => {
-          if (err)
-            serveError(err, 500, 'Server Error', res)
-        })
+        if (req.headers.range) // stream if range is requested
+          streamMedia(filePath, stats, req, res)
+        else // else serve entire file
+          serveFile(filePath, res, (err) => {
+            if (err)
+              serveError(err, 500, 'Server Error', res)
+          })
       } else if (stats.isDirectory()) { // serve index directory
         serveIndex(filePath, res, (err) => {
           if (err)
