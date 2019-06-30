@@ -60,6 +60,7 @@ typings/
 # next.js build output
 .next
 
-# ignore data and media directories
+# ignore data, media, and fonts directories
 data/
 public/media
+public/fonts
