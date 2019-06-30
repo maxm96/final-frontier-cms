@@ -52,6 +52,7 @@ function generateMainHTML(cards) {
         <link href="assets/css/mockup.css" rel="stylesheet" type="text/css">
         <link href="assets/css/final-frontier.css" rel="stylesheet" type="text/css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
       </head>
       <body>
         <div class="main-page">
