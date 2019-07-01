@@ -44,6 +44,7 @@ module.exports = function requestHandler(req, res) {
               serveError(err, 500, 'Server Error', res)
           })
       } else if (stats.isDirectory()) { // serve index directory
+        /** TODO: index links are broken **/
         serveIndex(filePath, res, (err) => {
           if (err)
             serveError(err, 500, 'Server Error', res)

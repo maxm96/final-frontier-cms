@@ -1,3 +1,5 @@
+/** This module is broken **/
+
 const fs = require('fs')
 const path = require('path')
 const serveFile = require('./serve-file')
@@ -55,21 +57,19 @@ function generateIndexHTML(dirPath, callback) {
     if (err)
       return err
     
-    var pathname = path.join('..', dirPath)
-    
     // create Links
     var links = items.map(function(item) {
-      return `<li><a href="${path.join(pathname, item)}">${item}</a></li>`
+      return `<li><a href="${path.join(dirPath, item)}">${item}</a></li>`
     });
     // generate HTML
     var html = `
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Index of ${pathname}</title>
+          <title>Index of ${dirPath}</title>
         <head>
         <body>
-          <h1>Index of ${pathname}</h1>
+          <h1>Index of ${dirPath}</h1>
           <ul>
             ${links.join("")}
           <ul>
