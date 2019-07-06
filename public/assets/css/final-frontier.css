@@ -19,6 +19,12 @@ h1, h2, h3, h4 {
 }
 
 /* Main page */
+.main-page {
+    width: 100vw;
+    height: 100vh;
+    overflow-y: scroll;
+}
+
 .main-page > h1 {
     text-align: center;
 }

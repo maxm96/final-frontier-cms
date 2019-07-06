@@ -63,4 +63,3 @@ typings/
 # ignore data, media, and fonts directories
 data/
 public/media
-public/fonts
