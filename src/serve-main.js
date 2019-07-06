@@ -1,5 +1,6 @@
 const fs = require('fs')
 const generateCardHTML = require('./generate-card-html')
+const dataStore = require('./data-store')
 
 /** @callback serveMain~callback
  * @param {string|object} err - any error encountered
@@ -12,19 +13,16 @@ const generateCardHTML = require('./generate-card-html')
  * @param {serveMain~callback} callback - callback to invoke after encountering an error
  */ 
 module.exports = function serveMain(req, res, callback) {
-  // read cards json
-  fs.readFile('data/cards.json', { encoding: 'utf-8' }, (err, cards) => {
+  // read from database
+  dataStore.read('article', null, (err, items) => {
     if (err)
       callback(err)
     
-    // generate html
-    var html = generateMainHTML(JSON.parse(cards))
+    var html = generateMainHTML(items)
     
-    // set type and length headers
     res.setHeader('Content-Type', 'text/html')
     res.setHeader('Content-Length', html.length)
     
-    // and serve
     res.end(html)
   })
 }
@@ -33,7 +31,7 @@ module.exports = function serveMain(req, res, callback) {
  * Generates the main page HTML.
  * @param {array} cards - all card data
  */ 
-function generateMainHTML(cards) {
+function generateMainHTML(cards) {  
   // map over cards, generating html blocks wrapped in a card div for each
   var cardsHTML = cards.map((card) => {
     return `

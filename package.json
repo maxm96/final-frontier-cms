@@ -15,5 +15,8 @@
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/maxm96/final-frontier-cms/issues"
+  },
+  "dependencies": {
+    "sqlite3": "^4.0.9"
   }
 }
