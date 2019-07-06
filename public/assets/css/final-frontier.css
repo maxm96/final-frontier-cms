@@ -201,3 +201,16 @@ h1, h2, h3, h4 {
 .audio-desc {
   text-align: center;
 }
+
+/* Admin */
+.admin-page {
+  text-align: center;
+}
+
+.upload-buttons {
+  position: flex;
+  flex-direction: column;
+}
+.upload-buttons > a {
+  text-decoration: none;
+}
