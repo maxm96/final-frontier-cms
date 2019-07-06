@@ -5,6 +5,7 @@ const serveMain = require('./serve-main')
 const serveFile = require('./serve-file')
 const serveIndex = require('./serve-index')
 const streamMedia = require('./stream-media')
+const createCard = require('./create-card')
 const serveError = require('./serve-error')
 
 
@@ -22,10 +23,22 @@ module.exports = function requestHandler(req, res) {
       })
       break
     case '/admin':
-      // TODO
+      serveFile(path.join('public', 'admin.html'), res, (err) => {
+        if (err)
+          serveError(err, 500, 'Server Error', res)
+      })
       break
     case '/create':
-      // TODO
+      createCard(req, res, (err) => {
+        if (err)
+          return serveError(err, 500, 'Server Error', res)
+        
+        // redirect to main page
+        res.statusCode = 303
+        res.statusMessage = 'See Other'
+        res.setHeader('Location', '/')
+        res.end()
+      })
       break
     default: // serve some other resource
       serveResource(req, res)

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en-us">
+    <title>Card Create</title>
+    <link href="/assets/css/mockup.css" rel="stylesheet" type="text/css">
+    <link href="/assets/css/final-frontier.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div class="create-form create-gallery">
+      <h1>Create a Gallery Card</h1>
+      <form method="POST" action="/create">
+        <input type="hidden" name="type" value="gallery">
+        
+        <label for="title">Title:</label>
+        <input type="text" name="title">
+        
+        <label for="body">Description:</label>
+        <textarea name="description"></textarea>
+        
+        <!-- TODO: add image uploads -->
+        
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+    <script src="/assets/js/final-frontier.js"></script>
+  </body>
+</html>
