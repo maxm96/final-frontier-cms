@@ -6,6 +6,8 @@ const serveFile = require('./serve-file')
 const serveIndex = require('./serve-index')
 const streamMedia = require('./stream-media')
 const createCard = require('./create-card')
+const serveAdmin = require('./serve-admin')
+const serveCreateForm = require('./serve-create-form')
 const serveError = require('./serve-error')
 
 
@@ -23,10 +25,10 @@ module.exports = function requestHandler(req, res) {
       })
       break
     case '/admin':
-      serveFile(path.join('public', 'admin.html'), res, (err) => {
-        if (err)
-          serveError(err, 500, 'Server Error', res)
-      })
+      serveAdmin(req, res)
+      break
+    case '/create-form':
+      serveCreateForm(req, res)
       break
     case '/create':
       createCard(req, res, (err) => {

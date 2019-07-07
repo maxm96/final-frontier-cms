@@ -18,8 +18,6 @@ module.exports = function serveMain(req, res, callback) {
     if (err)
       callback(err)
     
-    console.log(items)
-    
     var html = generateMainHTML(items)
     
     res.setHeader('Content-Type', 'text/html')

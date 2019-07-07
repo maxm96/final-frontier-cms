@@ -1,6 +1,3 @@
-const dataStore = require('./data-store')
-
-
 /** @module generateCardHTML 
  * Generates the appropriate HTML for the supplied card data 
  * @param {object} cardData - An object describing a card
@@ -27,10 +24,10 @@ module.exports = function generateCardHTML(cardData) {
 function generateAudioCardHTML(cardData) {
   return `
     <h2 class="card-title">${cardData.title}</h2>
-      <audio controls>
-        <source src="${cardData.source}" type="audio/mp3">
-      </audio>
-      <p class="audio-desc">${cardData.description}</p>
+    <audio controls>
+      <source src="${cardData.source}" type="audio/mp3">
+    </audio>
+    <p class="audio-desc">${cardData.description}</p>
   `
 }
 
