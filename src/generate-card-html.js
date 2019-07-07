@@ -1,3 +1,6 @@
+const dataStore = require('./data-store')
+
+
 /** @module generateCardHTML 
  * Generates the appropriate HTML for the supplied card data 
  * @param {object} cardData - An object describing a card

@@ -17,10 +17,8 @@ module.exports = function createCard(req, res, cb) {
         createArticle(req.body, cb)
         break
       case 'audio':
-        createAudio(req.body, cb)
-        break
       case 'video':
-        createVideo(req.body, cb)
+        writeAndStoreResource(req.body, cb)
         break
       case 'gallery':
         createGallery(req.body, cb)
@@ -55,40 +53,56 @@ function createArticle(body, cb) {
  * @param {string|object} err - any errors that occured or null if none
  */
 
-/** @function createAudio
- * Create an audio resource.
- * @param {object} body - the body of the request
- * @param {createAudio~callback} cb - the callback to invoke when done
- */
-function createAudio(body, cb) {
-  writeAndStoreResource(body, cb)
-}
-
-/** @callback createAudio~callback
- * The callback invoked by createAudio.
- * @param {string|object} err - any error that occured or null if none
- */
-
-/** @function createVideo
- * Create a video resource.
- * @param {object} body - the body of the request
- * @param {createVideo~callback} cb - the callback to invoke when done
- */
-function createVideo(body, cb) {
-  writeAndStoreResource(body, cb)
-}
-
-/** @callback createVideo~callback
- * The callback invoked by createVideo.
- * @param {string|object} err - any error that occurred or null if none
- */
-
 /** @function createGallery
  * Create a gallery resource.
  * @param {object} body - the body of the request
  * @param {createGallery~callback} cb - the callback to invoke when done
  */
-function createGallery(body, cb) {}
+function createGallery(body, cb) {
+  // create gallery resource
+  var gallery = {
+    title: body.title,
+    description: body.description,
+    type: body.type,
+  }
+  
+  dataStore.create(gallery, (err, galleryId) => {
+    if (err)
+      return cb(err)
+    
+    // make sure images directory exists
+    var dirPath = 'public/media/images'
+    
+    mkdirp(dirPath, (err) => {
+      if (err)
+        return cb(err)
+      
+      // get array of file objects
+      var files = Array.isArray(body.source) ? body.source : [body.source]
+      
+      // here we go
+      var promises = files.map((file) => {
+        return new Promise((resolve, reject) => {
+          fs.writeFile(`${dirPath}/${file.filename}`, file.data, (err) => {
+            if (err)
+              reject(err)
+            resolve()
+          })
+        })
+      })
+      
+      // create gallery image objects from files
+      var galleryImages = files.map(file => {
+        return {
+          gallery_id: galleryId,
+          source: `media/images/${file.filename}`
+        }
+      })
+      
+      Promise.all(promises).then(_ => dataStore.createGalleryImages(galleryImages, cb))
+    })
+  })
+}
 
 /** @callback createGallery~callback
  * The callback invoked by createGallery.
@@ -96,7 +110,7 @@ function createGallery(body, cb) {}
  */
 
 /** @function writeAndStoreResource
- * Helper function to write uploaded file to filesystem and creates resource in db.
+ * Write uploaded file to filesystem and create a resource in db.
  * @param {object} body - the request body
  * @param {writeAndStoreResource~callback} cb - the callback to invoke when done
  */

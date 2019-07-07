@@ -70,7 +70,19 @@ function parseMultipart(buffer, boundary) {
   var formData = {}
   splitContentParts(buffer, boundary).forEach((content) => {
     var parts = parseContentPart(content)
-    formData[parts[0]] = parts[1]
+    
+    // hanlde multi file uploads
+    if (formData[parts[0]]) { // input field already exists in form data
+      if (!Array.isArray(formData[parts[0]])) {
+        // turn formData[parts[0]] into an array
+        formData[parts[0]] = [formData[parts[0]]]
+      }
+
+      // push files on array
+      formData[parts[0]].push(parts[1])
+    } else {
+      formData[parts[0]] = parts[1]
+    }
   })
   
   return formData
