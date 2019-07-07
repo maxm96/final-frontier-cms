@@ -10,16 +10,17 @@
   <body>
     <div class="create-form create-audio">
       <h1>Create an Audio Card</h1>
-      <form method="POST" action="/create">
+      <form method="POST" action="/create" enctype="multipart/form-data">
         <input type="hidden" name="type" value="audio">
         
         <label for="title">Title:</label>
         <input type="text" name="title">
         
-        <label for="body">Description:</label>
+        <label for="description">Description:</label>
         <textarea name="description"></textarea>
         
-        <!-- TODO: add audio upload -->
+        <label for="source">Audio File:</label>
+        <input type="file" accept="audio/*" name="source">
         
         <input type="submit" value="Submit">
       </form>

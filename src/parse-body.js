@@ -33,6 +33,7 @@ module.exports = function parseBody(req, res, cb) {
           res.statusMessage = 'Unprocessable Entity'
           res.end()
         }
+        break
       case 'text/plain':
         req.body = buff.toString()
         return cb(req, res)

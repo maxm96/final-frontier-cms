@@ -1,3 +1,5 @@
+const fs = require('fs')
+const mkdirp = require('mkdirp')
 const parseBody = require('./parse-body')
 const dataStore = require('./data-store')
 
@@ -10,8 +12,6 @@ const dataStore = require('./data-store')
  */
 module.exports = function createCard(req, res, cb) {
   parseBody(req, res, (req, res) => {
-    console.log(req)
-    
     switch (req.body.type) {
       case 'article':
         createArticle(req.body, cb)
@@ -40,11 +40,12 @@ module.exports = function createCard(req, res, cb) {
  * @param {createArticle~callback} cb - the callback to invoke when done
  */
 function createArticle(body, cb) {
+  console.log(body)
   dataStore.create(
-    'article',
     {
       title: body.title,
       body: body.body,
+      type: body.type,
     },
     cb
   )
@@ -60,7 +61,35 @@ function createArticle(body, cb) {
  * @param {object} body - the body of the request
  * @param {createAudio~callback} cb - the callback to invoke when done
  */
-function createAudio(body, cb) {}
+function createAudio(body, cb) {
+  var dirPath = 'public/media/audio'
+  
+  // create directory if not exists
+  mkdirp(dirPath, (err) => {
+    if (err)
+      return cb(err)
+    
+    // write file to filesystem
+    fs.writeFile(`${dirPath}/${body.source.filename}`, body.source.data, (err) => {
+      if (err)
+        return cb(err)
+      
+      // do not save full filepath in db as it is computed later
+      var storedPath = `media/audio/${body.source.filename}`
+      
+      // insert record into database
+      dataStore.create(
+        {
+          title: body.title,
+          description: body.description,
+          source: storedPath,
+          type: body.type,
+        },
+        cb
+      )
+    })
+  })
+}
 
 /** @callback createAudio~callback
  * The callback invoked by createAudio.

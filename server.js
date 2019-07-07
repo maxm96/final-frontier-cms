@@ -8,7 +8,11 @@ var port = 3000
 var server = http.createServer(requestHandler)
 
 // initialize database
-createDatabase(() => {
-  console.log('Initialization complete')
+createDatabase((err) => {
+  if (err) {
+    console.error(err)
+    process.exit(1)
+  }    
+  
   server.listen(port, () => console.log(`Server is listening on port ${port}`))
 })

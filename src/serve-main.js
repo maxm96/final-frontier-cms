@@ -14,9 +14,11 @@ const dataStore = require('./data-store')
  */ 
 module.exports = function serveMain(req, res, callback) {
   // read from database
-  dataStore.read('article', null, (err, items) => {
+  dataStore.readAll((err, items) => {
     if (err)
       callback(err)
+    
+    console.log(items)
     
     var html = generateMainHTML(items)
     

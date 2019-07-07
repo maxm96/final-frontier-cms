@@ -8,19 +8,18 @@ var db = new sqlite3.Database('data/final_frontier.db')
 
 /** @function create
  * Creates an entry in the specified table of the database.
- * @param {string} table - the table to insert into
  * @param {object} item - the item to be created
  * @param {create~callback} cb - the callback to invoke when done
  */ 
-function create(table, item, cb) {
-  if (!table || !item) {
-    return cb('Error: missing required arguments for create.')
+function create(item, cb) {
+  if (!item) {
+    return cb('Error: missing required argument for create.')
   }
   
   var columns = Object.keys(item).join()
   var values = Object.values(item).map(i => `'${i}'`).join()
   
-  db.run(`INSERT INTO ${table} (${columns}) VALUES (${values})`, cb)
+  db.run(`INSERT INTO card (${columns}) VALUES (${values})`, cb)
 }
 
 /** @callback create~callback
@@ -32,22 +31,15 @@ function create(table, item, cb) {
 
 /** @function read
  * Reads the item from the database.
- * @param {string} table - the table to read from
- * @param {integer|null} id - the id of the item to read, or null if requesting all items
+ * @param {integer|null} id - the id of the item to read
  * @param {read~callback} cb - the callback to invoke when done
  */
-function read(table, id, cb) {
-  if (!table) {
-    return cb('Error: missing required table argument for read.')
+function read(id, cb) {
+  if (!id) {
+    return cb('Error: missing required argument for read.')
   }
   
-  var sql = `SELECT * FROM ${table}`
-  
-  if (id) {
-    db.get(`${sql} WHERE id=?`, id, cb)
-  } else {
-    db.all(sql, cb)
-  }
+  db.get(`SELECT * FROM card WHERE id=?`, id, cb)
 }
 
 /** @callback read~callback
@@ -57,22 +49,35 @@ function read(table, id, cb) {
  */
 
 
+/** @function readAll
+ * Retrieve each entry from each table in the database.
+ * @param {readAll~callback} cb - the callback to invoke when done
+ */
+function readAll(cb) {
+  db.all('SELECT * FROM card', cb)
+}
+
+/** @callback readAll~callback
+ * Callback invoked by dataStore.readAll method.
+ * @param {string|object} err - any error that occured
+ * @param {array} items - the retrieved items
+ */
+
 /** @function update
  * Updates the specified item in the database.
- * @param {string} table - the table of the item
  * @param {integer} id - the id of the item
  * @param {object} updates - the updates to apply
  * @param {update~callback} cb - the callback to invoke when done
  */
-function update(table, id, updates, cb) {
-  if (!table || !id) {
-    return cb('Error: missing required arguments for update.')
+function update(id, updates, cb) {
+  if (!id) {
+    return cb('Error: missing required argument for update.')
   }
   
   delete updates.id // prevent id update
   
   var updateSql = Object.keys(updates).map(k => `${k}=?`).join()
-  var sql = `UPDATE ${table} SET ${updateSql} WHERE id=?`
+  var sql = `UPDATE card SET ${updateSql} WHERE id=?`
   var updateValues = Object.values(updates)
   updateValues.push(id)
   
@@ -88,16 +93,15 @@ function update(table, id, updates, cb) {
 
 /** @function destroy
  * Removes the specified item from the database.
- * @param {string} table - the table of the item
  * @param {integer} id - the id of the item
  * @param {destroy~callback} cb - the callback to invoke when done
  */
-function destroy(table, id, cb) {
-  if (!table || !id) {
-    return cb('Error: missing required arguments for destroy.')
+function destroy(id, cb) {
+  if (!id) {
+    return cb('Error: missing required argument for destroy.')
   }
   
-  db.run(`DELETE FROM ${table} WHERE id=?`, id, cb)
+  db.run(`DELETE FROM card WHERE id=?`, id, cb)
 }
 
 /** @callback destroy~callback
@@ -110,6 +114,7 @@ function destroy(table, id, cb) {
 module.exports = {
   create: create,
   read: read,
+  readAll: readAll,
   update: update,
   destroy: destroy,
 }
