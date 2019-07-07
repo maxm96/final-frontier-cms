@@ -40,7 +40,6 @@ module.exports = function createCard(req, res, cb) {
  * @param {createArticle~callback} cb - the callback to invoke when done
  */
 function createArticle(body, cb) {
-  console.log(body)
   dataStore.create(
     {
       title: body.title,
@@ -62,33 +61,7 @@ function createArticle(body, cb) {
  * @param {createAudio~callback} cb - the callback to invoke when done
  */
 function createAudio(body, cb) {
-  var dirPath = 'public/media/audio'
-  
-  // create directory if not exists
-  mkdirp(dirPath, (err) => {
-    if (err)
-      return cb(err)
-    
-    // write file to filesystem
-    fs.writeFile(`${dirPath}/${body.source.filename}`, body.source.data, (err) => {
-      if (err)
-        return cb(err)
-      
-      // do not save full filepath in db as it is computed later
-      var storedPath = `media/audio/${body.source.filename}`
-      
-      // insert record into database
-      dataStore.create(
-        {
-          title: body.title,
-          description: body.description,
-          source: storedPath,
-          type: body.type,
-        },
-        cb
-      )
-    })
-  })
+  writeAndStoreResource(body, cb)
 }
 
 /** @callback createAudio~callback
@@ -101,7 +74,9 @@ function createAudio(body, cb) {
  * @param {object} body - the body of the request
  * @param {createVideo~callback} cb - the callback to invoke when done
  */
-function createVideo(body, cb) {}
+function createVideo(body, cb) {
+  writeAndStoreResource(body, cb)
+}
 
 /** @callback createVideo~callback
  * The callback invoked by createVideo.
@@ -116,6 +91,46 @@ function createVideo(body, cb) {}
 function createGallery(body, cb) {}
 
 /** @callback createGallery~callback
- * The callback invoked by createGallery
+ * The callback invoked by createGallery.
  * @param {string|objcet} err - any error that occurred or null if none
+ */
+
+/** @function writeAndStoreResource
+ * Helper function to write uploaded file to filesystem and creates resource in db.
+ * @param {object} body - the request body
+ * @param {writeAndStoreResource~callback} cb - the callback to invoke when done
+ */
+function writeAndStoreResource(body, cb) {
+  var dirPath = `public/media/${body.type}`
+  
+  // create directory if it doesn't exist
+  mkdirp(dirPath, (err) => {
+    if (err)
+      return cb(err)
+    
+    // write file data to filesystem
+    fs.writeFile(`${dirPath}/${body.source.filename}`, body.source.data, (err) => {
+      if (err)
+        return cb(err)
+      
+      // do not save full public path to db
+      var storedPath = `media/${body.type}/${body.source.filename}`
+      
+      // insert resource into db
+      dataStore.create(
+        {
+          title: body.title,
+          description: body.description,
+          source: storedPath,
+          type: body.type,
+        },
+        cb
+      )
+    })
+  })
+}
+
+/** @callback writeAndStoreResource~callback
+ * The callback invoked by writeAndStoreResource.
+ * @param {string|object} err - any error that occurred or null if none
  */

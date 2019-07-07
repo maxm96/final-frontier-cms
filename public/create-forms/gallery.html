@@ -13,11 +13,15 @@
       <form method="POST" action="/create" enctype="multipart/form-data">
         <input type="hidden" name="type" value="gallery">
         
-        <label for="title">Title:</label>
-        <input type="text" name="title">
+        <fieldset>
+          <label for="title">Title:</label>
+          <input type="text" name="title">
+        </fieldset>
         
-        <label for="body">Description:</label>
-        <textarea name="description"></textarea>
+        <fieldset>
+          <label for="description">Description:</label>
+          <textarea rows="10" name="description"></textarea>
+        </fieldset>
         
         <!-- TODO: add image uploads -->
         

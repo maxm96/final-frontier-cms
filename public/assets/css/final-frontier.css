@@ -214,3 +214,26 @@ h1, h2, h3, h4 {
 .upload-buttons > a {
   text-decoration: none;
 }
+
+/* Create Forms */
+.create-form {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-form input:not([type="submit"]),
+.create-form textarea {
+  width: 100%;
+  font-size: 16px;
+}
+.create-form fieldset {
+  border: none;
+  width: 500px;
+  margin: 0 auto;
+}
+.create-form label {
+  display: block;
+  float: left;
+  font-size: 18px;
+}

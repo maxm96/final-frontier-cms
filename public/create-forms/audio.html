@@ -13,14 +13,20 @@
       <form method="POST" action="/create" enctype="multipart/form-data">
         <input type="hidden" name="type" value="audio">
         
-        <label for="title">Title:</label>
-        <input type="text" name="title">
+        <fieldset>
+          <label for="title">Title:</label>
+          <input type="text" name="title">
+        </fieldset>
         
-        <label for="description">Description:</label>
-        <textarea name="description"></textarea>
-        
-        <label for="source">Audio File:</label>
-        <input type="file" accept="audio/*" name="source">
+        <fieldset>
+          <label for="description">Description:</label>
+          <textarea rows="10" name="description"></textarea>
+        </fieldset>
+    
+        <fieldset>
+          <label for="source">Audio File:</label>
+          <input type="file" accept="audio/*" name="source">
+        </fieldset>
         
         <input type="submit" value="Submit">
       </form>
