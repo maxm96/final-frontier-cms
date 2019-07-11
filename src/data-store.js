@@ -101,6 +101,7 @@ function readAll(cb) {
       }
     })
     
+    // wait for prmises to resolve then invoke callback
     Promise.all(promises).then(_ => cb(null, completeItems))
   })
 }

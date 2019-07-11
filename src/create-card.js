@@ -99,6 +99,7 @@ function createGallery(body, cb) {
         }
       })
       
+      // wait for promises to resolve and add gallery images to db
       Promise.all(promises).then(_ => dataStore.createGalleryImages(galleryImages, cb))
     })
   })
