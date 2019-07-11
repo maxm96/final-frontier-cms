@@ -56,7 +56,7 @@ function createGalleryImages(images, cb) {
 
 /** @function read
  * Reads the item from the database.
- * @param {integer|null} id - the id of the item to read
+ * @param {integer} id - the id of the item to read
  * @param {read~callback} cb - the callback to invoke when done
  */
 function read(id, cb) {
