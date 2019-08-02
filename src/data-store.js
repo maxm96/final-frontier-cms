@@ -1,188 +1,184 @@
-/** @module dataStore
- * Exposes CRUD methods for working with a sqlite database.
- */
-
 const sqlite3 = require('sqlite3').verbose()
-var db = new sqlite3.Database('data/final_frontier.db')
+const mkdirp = require('mkdirp')
+
+const createTables = `
+CREATE TABLE IF NOT EXISTS card (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  body TEXT,
+  description TEXT,
+  source TEXT,
+  type TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS gallery_image (
+  id INTEGER PRIMARY KEY,
+  gallery_id INTEGER,
+  source TEXT,
+  FOREIGN KEY (gallery_id) REFERENCES card (id)
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY,
+  username VARCHAR(75),
+  password VARCHAR(75)
+);
+`
 
 
-/** @function create
- * Creates an entry in the card table of the database.
- * @param {object} item - the item to be created
- * @param {create~callback} cb - the callback to invoke when done
- */ 
-function create(item, cb) {
-  if (!item)
-    return cb('Error: missing required argument for create.')
-  
-  var columns = Object.keys(item).join()
-  var values = Object.values(item).map(i => `'${i}'`).join()
-  
-  db.run(`INSERT INTO card (${columns}) VALUES (${values})`, function (err) {
-    if (err)
-      return cb(err)
+/** @module DataStore
+ * Instantiates a sqlite database and exposes 
+ * queries to interact with the database.
+ */
+module.exports = class DataStore {
+  /** @constructor
+   * Creates an instance of DataStore.
+   */
+  constructor() {
+    // make sure data directory exists
+    mkdirp.sync('data')
     
-    cb(null, this.lastID)
-  })
-}
-
-/** @callback create~callback
- * Callback invoked by dataStore.create method.
- * @param {string|object} err - any error that occured
- * @param {integer} id - the id assigned to the item  
- */
-
-
-/** @function createGalleryImages
- * Inserts an entry to the gallery_image table.
- * @param {array} images - an array of image objects to insert
- * @param {createGalleryImages~callback} cb - the callback to invoke when done
- */
-function createGalleryImages(images, cb) {
-  if (!images)
-    return cb('Error: missing required argument to create gallery images.')
-  
-  var columns = Object.keys(images[0]).join()
-  var values = images.map(image => Object.values(image).map(i => `'${i}'`).join())
-  
-  db.run(`INSERT INTO gallery_image (${columns}) VALUES ${values.map(v => `(${v})`).join()}`, cb)
-}
-
-/** @callback createGalleryImages~callback
- * Callback invoked by dataStore.createGalleryImages method.
- * @param {string|object} err - any error that occured
- */
-
-
-/** @function read
- * Reads the item from the database.
- * @param {integer} id - the id of the item to read
- * @param {read~callback} cb - the callback to invoke when done
- */
-function read(id, cb) {
-  if (!id) {
-    return cb('Error: missing required argument for read.')
+    this.db = new sqlite3.Database('data/final_frontier.db')
+    this.db.run(createTables, err => console.error(err))
+    
+    this.create = this.create.bind(this)
+    this.read = this.read.bind(this)
+    this.readAll = this.readAll.bind(this)
+    this.update = this.update.bind(this)
+    this.destroy = this.destroy.bind(this)
   }
   
-  db.get(`SELECT * FROM card WHERE id=?`, id, cb)
-}
-
-/** @callback read~callback
- * Callback invoked by dataStore.read method.
- * @param {string|object} err - any error that occured
- * @param {object} item - the requested item
- */
-
-
-/** @function readAll
- * Retrieve each entry from each table in the database.
- * @param {readAll~callback} cb - the callback to invoke when done
- */
-function readAll(cb) {
-  db.all('SELECT * FROM card', (err, items) => {
-    if (err)
-      return cb(err)
-    
-    // instantiate variable to modify
-    var completeItems = [...items]
-    
-    // get images for gallery
-    var promises = items.map((item, index) => {
-      if (item.type === 'gallery') {
-        return new Promise((resolve, reject) => {
-          readGalleryImages(item.id, (err, images) => {
-            if (err)
-              return reject(err)
-            
-            completeItems[index]['images'] = images.map(image => image.source)
-            resolve()
-          })
-        })
+  /** @function create
+   * Inserts the given item into the specified table.
+   * @param {string} table - the table to insert the item into
+   * @param {object|array} item - an object or array of objects of properties to insert into the database
+   * @returns {Promise} resolves to the id of the inserted item
+   */
+  create(table, item) {
+    return new Promise((resolve, reject) => {
+      if (!table || typeof table !== 'string')
+        reject(new TypeError('The table must be a non-empty string'))
+      
+      var itemType = typeof item
+      
+      if (!item || (itemType !== 'object' && itemType !== 'array'))
+        reject(new TypeError('The item must be a valid object or array of objects'))
+      
+      var columns = ''
+      var values = ''
+      
+      if (itemType === 'array') {
+        columns = Object.keys(item[0]).join()
+        // map over items array to create values string
+        values = item
+          .map(i => Object.values(i).map(v => `'${v}'`).join())
+          .map(vStr => `(${vStr})`).join()
+      } else {
+        columns = Object.keys(item).join()
+        values = Object.values(item).map(i => `'${i}'`).join()
       }
+      
+      this.db.run(`INSERT INTO ${table} (${columns}) VALUES (${values})`, function (err) {
+        if (err)
+          reject(err)
+        
+        resolve(this.lastID)
+      })
     })
-    
-    // wait for prmises to resolve then invoke callback
-    Promise.all(promises).then(_ => cb(null, completeItems))
-  })
-}
-
-/** @callback readAll~callback
- * Callback invoked by dataStore.readAll method.
- * @param {string|object} err - any error that occured
- * @param {array} items - the retrieved items
- */
-
-
-/** @function readGalleryImages
- * Retrieves gallery images for a given gallery.
- * @param {integer} galleryId - the gallery id
- * @param {readGalleryImage~callback} cb - the callback to invoke when done
- */
-function readGalleryImages(galleryId, cb) {
-  db.all('SELECT * FROM gallery_image WHERE gallery_id=?', galleryId, cb)
-}
-
-/** @callback readGalleryImages~callback
- * Callback invoked by the dataStore.readGalleryImages method.
- * @param {string|object} err - any error that occurred
- * @param {array} items - the retrieved gallery images
- */
-
-
-/** @function update
- * Updates the specified item in the database.
- * @param {integer} id - the id of the item
- * @param {object} updates - the updates to apply
- * @param {update~callback} cb - the callback to invoke when done
- */
-function update(id, updates, cb) {
-  if (!id) {
-    return cb('Error: missing required argument for update.')
   }
   
-  delete updates.id // prevent id update
-  
-  var updateSql = Object.keys(updates).map(k => `${k}=?`).join()
-  var sql = `UPDATE card SET ${updateSql} WHERE id=?`
-  var updateValues = Object.values(updates)
-  updateValues.push(id)
-  
-  db.run(sql, updateValues, cb)
-}
-
-/** @callback update~callback
- * Callback invoked by dataStore.update method.
- * @param {string|object} err - any error that occured
- * @param {object} item [optional] - the updated item
- */
-
-
-/** @function destroy
- * Removes the specified item from the database.
- * @param {integer} id - the id of the item
- * @param {destroy~callback} cb - the callback to invoke when done
- */
-function destroy(id, cb) {
-  if (!id) {
-    return cb('Error: missing required argument for destroy.')
+  /** @function read
+   * Reads a single entry specified by the given id and table.
+   * @param {string} table - the table to read the item from
+   * @param {integer|string} id - the id to look for
+   * @returns {Promise} resolves to an item from the database
+   */
+  read(table, id) {
+    return new Promise((resolve, reject) => {
+      if (!table || typeof table !== 'string')
+        reject(new TypeError('The table must be a non-empty string'))
+      if (!id || (typeof id !== 'integer' && typeof id !== 'string'))
+        reject(new TypeError('The given id is invalid'))
+      
+      this.db.get(`SELECT * FROM ${table} WHERE id=?`, id, function (err, row) {
+        if (err)
+          reject(err)
+        
+        resolve(row)
+      })
+    })
   }
   
-  db.run(`DELETE FROM card WHERE id=?`, id, cb)
-}
-
-/** @callback destroy~callback
- * Callback invoked by the dataStore.destroy method.
- * @param {string|object} err - any error that occured
- * @param {object} item - the removed object
- */
-
-
-module.exports = {
-  create: create,
-  createGalleryImages: createGalleryImages,
-  read: read,
-  readAll: readAll,
-  readGalleryImages: readGalleryImages,
-  update: update,
-  destroy: destroy,
+  /** @function readAll
+   * Reads all entries from the specified table.
+   * @param {string} table - the table to read from
+   * @returns {Promise} resolves to the read entries
+   */
+  readAll(table) {
+    return new Promise((resolve, reject) => {
+      if (!table || typeof table !== 'string')
+        reject(new TypeError('The table must be a non-empty string'))
+      
+      this.db.all(`SELECT * FROM ${table}`, function (err, rows) {
+        if (err)
+          reject(err)
+        
+        resolve(rows)
+      })
+    })
+  }
+  
+  /** @function update
+   * Updates the specified resource.
+   * @param {string} table - the table of the resource
+   * @param {integer|string} - the id of the resource
+   * @param {object} updates - the updates to be applied
+   * @returns {Promise} resolves to the id of the updated resource
+   */
+  update(table, id, updates) {
+    return new Promise((resolve, reject) => {
+      if (!table || typeof table !== 'string')
+        reject(new TypeError('The table must be a non-empty string'))
+      if (!id || (typeof id !== 'integer' && typeof id !== 'string'))
+        reject(new TypeError('The given id is invalid'))
+      if (!updates || typeof updates !== 'object')
+        reject(new TypeError('Updates must be supplied as an object'))
+      
+      // don't want to change the resources id
+      delete updates.id
+      
+      var sql = `UPDATE ${table} SET ${Object.keys(updates).map(k => `${k}=?`).join()} WHERE id=?`
+      var updateValues = Object.values(updates)
+      updateValues.push(id)
+      
+      this.db.run(sql, updateValues, function (err) {
+        if (err)
+          reject(err)
+        
+        resolve(id)
+      })
+    })
+  }
+  
+  /** @function destroy
+   * Removes the specified resource from the database.
+   * @param {string} table - the table the resource is stored in
+   * @param {integer|string} id - the id of the resource
+   * @returns {Promise} resolves to the id of the deleted resource
+   */
+  destroy(table, id) {
+    return new Promise((resolve, reject) => {
+      if (!table || typeof table !== 'string')
+        reject(new TypeError('The table must be a non-empty string'))
+      if (!id || (typeof id !== 'integer' && typeof id !== 'string'))
+        reject(new TypeError('The given id is invalid'))
+      
+      this.db.run(`DELETE FROM ${table} WHERE id=?`, id, function (err) {
+        if (err)
+          reject(err)
+        
+        resolve(id)
+      })
+    })
+  }
 }

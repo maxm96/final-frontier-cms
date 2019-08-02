@@ -9,15 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxm96/final-frontier-cms.git"
+    "url": "git+https://github.com/maxm96/final-frontier-cms.git"
   },
   "author": "Max McDaniel",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/maxm96/final-frontier-cms/issues"
   },
   "dependencies": {
     "mkdirp": "^0.5.1",
     "sqlite3": "^4.0.9"
-  }
+  },
+  "homepage": "https://github.com/maxm96/final-frontier-cms#readme"
 }

@@ -6,8 +6,8 @@
 
 @font-face {
     font-family: "TNG Credits";
-    src: url("/assets/fonts/TNG_Credits.ttf") format("truetype"),
-        url("/assets/fonts/TNG_Credits.woff") format("woff");
+    src: url("/public/assets/fonts/TNG_Credits.ttf") format("truetype"),
+        url("/public/assets/fonts/TNG_Credits.woff") format("woff");
 }
 
 * {

@@ -1,0 +1,15 @@
+<div class="gallery-card">
+  <button class="close hide close-gallery" id="close-gallery-${cardData.id}" data-gallery-id="gallery-${cardData.id}">
+    &times; Close
+  </button>
+  <h2 class="card-title">${cardData.title}</h2>
+  <div class="gallery-content" id="gallery-${cardData.id}">
+    ${cardData.images.map((src, idx) => `<img src="${src}" alt="${idx}" class="gallery-${cardData.id}-image">`).join('')}
+    <div class="gallery-desc">${cardData.description}</div>
+  </div>
+</div>
+<div class="card-footer">
+  <button class="see-gallery" id="see-gallery-gallery-${cardData.id}" data-gallery-id="gallery-${cardData.id}">
+    See Gallery
+  </button>
+</div>

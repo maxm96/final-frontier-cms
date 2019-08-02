@@ -1,9 +1,9 @@
-/** @module generateCardHTML 
- * Generates the appropriate HTML for the supplied card data 
- * @param {object} cardData - An object describing a card
- * @returns {string} the generated HTML 
+/** @module generateCardHtml
+ * Generates HTML blocks for cards.
+ * @param {object} cardData - the supplied card data
+ * @returns {string} the generated html
  */
-module.exports = function generateCardHTML(cardData) {
+module.exports = function generateCardHtml(cardData) {
   switch (cardData.type) {
     case 'audio':
       return generateAudioCardHTML(cardData)
