@@ -19,11 +19,27 @@ var db = new DataStore()
 
 // endpoints
 const serveHomePage = require('./src/serve-home-page')
+const serveAdminPage = require('./src/serve-admin-page')
+const serveCreatePage = require('./src/serve-create-page')
+const createCard = require('./src/create-card')
 
-// set routes
+// set get routes
 router.addRoute('GET', '/', serveHomePage)
+router.addRoute('GET', '/admin', serveAdminPage)
 router.addRoute('GET', '/public/.+', staticContentServer.serveContent)
 
+// set post routes
+router.addRoute('POST', '/create-page', pair => {
+  wf.bodyParser(pair)
+    .then(serveCreatePage)
+    .catch(err => console.error(err))
+})
+router.addRoute('POST', '/create', pair => {
+  wf.bodyParser(pair)
+    .then(createCard)
+    .then(serveHomePage)
+    .catch(err => console.error(err))
+})
 
 // instantiate server
 var server = http.createServer((req, res) => {

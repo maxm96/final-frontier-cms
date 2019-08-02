@@ -39,13 +39,17 @@ module.exports = class DataStore {
     mkdirp.sync('data')
     
     this.db = new sqlite3.Database('data/final_frontier.db')
-    this.db.run(createTables, err => console.error(err))
-    
-    this.create = this.create.bind(this)
-    this.read = this.read.bind(this)
-    this.readAll = this.readAll.bind(this)
-    this.update = this.update.bind(this)
-    this.destroy = this.destroy.bind(this)
+    this.db.exec(createTables, err => {
+      if (err)
+        console.error(err)
+      
+      this.create = this.create.bind(this)
+      this.read = this.read.bind(this)
+      this.readAll = this.readAll.bind(this)
+      this.readGalleryImages = this.readGalleryImages.bind(this)
+      this.update = this.update.bind(this)
+      this.destroy = this.destroy.bind(this)
+    })
   }
   
   /** @function create
@@ -58,16 +62,13 @@ module.exports = class DataStore {
     return new Promise((resolve, reject) => {
       if (!table || typeof table !== 'string')
         reject(new TypeError('The table must be a non-empty string'))
-      
-      var itemType = typeof item
-      
-      if (!item || (itemType !== 'object' && itemType !== 'array'))
+      if (!item || typeof item !== 'object')
         reject(new TypeError('The item must be a valid object or array of objects'))
       
       var columns = ''
       var values = ''
       
-      if (itemType === 'array') {
+      if (Array.isArray(item)) {
         columns = Object.keys(item[0]).join()
         // map over items array to create values string
         values = item
@@ -75,10 +76,10 @@ module.exports = class DataStore {
           .map(vStr => `(${vStr})`).join()
       } else {
         columns = Object.keys(item).join()
-        values = Object.values(item).map(i => `'${i}'`).join()
+        values = '(' + Object.values(item).map(i => `'${i}'`).join() + ')'
       }
       
-      this.db.run(`INSERT INTO ${table} (${columns}) VALUES (${values})`, function (err) {
+      this.db.run(`INSERT INTO ${table} (${columns}) VALUES ${values}`, function (err) {
         if (err)
           reject(err)
         
@@ -90,14 +91,14 @@ module.exports = class DataStore {
   /** @function read
    * Reads a single entry specified by the given id and table.
    * @param {string} table - the table to read the item from
-   * @param {integer|string} id - the id to look for
+   * @param {number|string} id - the id to look for
    * @returns {Promise} resolves to an item from the database
    */
   read(table, id) {
     return new Promise((resolve, reject) => {
       if (!table || typeof table !== 'string')
         reject(new TypeError('The table must be a non-empty string'))
-      if (!id || (typeof id !== 'integer' && typeof id !== 'string'))
+      if (!id || (typeof id !== 'number' && typeof id !== 'string'))
         reject(new TypeError('The given id is invalid'))
       
       this.db.get(`SELECT * FROM ${table} WHERE id=?`, id, function (err, row) {
@@ -128,10 +129,29 @@ module.exports = class DataStore {
     })
   }
   
+  /** @function readGalleryImages
+   * Reads gallery images that match the provided parent id.
+   * @param {number|string} galleryId - the gallery id
+   * @returns {Promise} resolves to the read gallery images
+   */
+  readGalleryImages(galleryId) {
+    return new Promise((resolve, reject) => {
+      if (!galleryId || (typeof galleryId !== 'number' && typeof galleryId !== 'string'))
+        reject(new TypeError(`Invalid galleryId ${galleryId}`))
+      
+      this.db.all(`SELECT * FROM gallery_image WHERE gallery_id=?`, galleryId, function (err, rows) {
+        if (err)
+          reject(err)
+        
+        resolve(rows)
+      })
+    })
+  }
+  
   /** @function update
    * Updates the specified resource.
    * @param {string} table - the table of the resource
-   * @param {integer|string} - the id of the resource
+   * @param {number|string} - the id of the resource
    * @param {object} updates - the updates to be applied
    * @returns {Promise} resolves to the id of the updated resource
    */
@@ -139,7 +159,7 @@ module.exports = class DataStore {
     return new Promise((resolve, reject) => {
       if (!table || typeof table !== 'string')
         reject(new TypeError('The table must be a non-empty string'))
-      if (!id || (typeof id !== 'integer' && typeof id !== 'string'))
+      if (!id || (typeof id !== 'number' && typeof id !== 'string'))
         reject(new TypeError('The given id is invalid'))
       if (!updates || typeof updates !== 'object')
         reject(new TypeError('Updates must be supplied as an object'))
@@ -163,14 +183,14 @@ module.exports = class DataStore {
   /** @function destroy
    * Removes the specified resource from the database.
    * @param {string} table - the table the resource is stored in
-   * @param {integer|string} id - the id of the resource
+   * @param {number|string} id - the id of the resource
    * @returns {Promise} resolves to the id of the deleted resource
    */
   destroy(table, id) {
     return new Promise((resolve, reject) => {
       if (!table || typeof table !== 'string')
         reject(new TypeError('The table must be a non-empty string'))
-      if (!id || (typeof id !== 'integer' && typeof id !== 'string'))
+      if (!id || (typeof id !== 'number' && typeof id !== 'string'))
         reject(new TypeError('The given id is invalid'))
       
       this.db.run(`DELETE FROM ${table} WHERE id=?`, id, function (err) {

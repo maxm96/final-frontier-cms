@@ -16,6 +16,9 @@ module.exports = function generateCardHtml(cardData) {
   }
 }
 
+/** @function getGalleryImages
+ * Gets gallery images from the database 
+
 /** @function generateAudioCardHTML
  * A helper function to generate audio card HTML 
  * @param {object} cardData - the audio card data 
@@ -66,7 +69,7 @@ function generateGalleryCardHTML(cardData) {
       </button>
       <h2 class="card-title">${cardData.title}</h2>
       <div class="gallery-content" id="gallery-${cardData.id}">
-        ${cardData.images.map((src, idx) => `<img src="${src}" alt="${idx}" class="gallery-${cardData.id}-image">`).join('')}
+        ${cardData.images.map(image => `<img src="${image.source}" alt="${image.id}" class="gallery-${image.gallery_id}-image">`).join('')}
         <div class="gallery-desc">${cardData.description}</div>
       </div>
     </div>

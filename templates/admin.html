@@ -2,8 +2,8 @@
 <html>
   <head lang="en-us">
     <title>Admin</title>
-    <link href="assets/css/mockup.css" rel="stylesheet" type="text/css">
-    <link href="assets/css/final-frontier.css" rel="stylesheet" type="text/css">
+    <link href="/public/assets/css/mockup.css" rel="stylesheet" type="text/css">
+    <link href="/public/assets/css/final-frontier.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
   </head>
@@ -13,7 +13,7 @@
       <div class="upload-buttons">
         ${cardTypes.map((type) => {
           return `
-            <form method="POST" action="/create-form">
+            <form method="POST" action="/create-page">
               <input type="hidden" name="type" value="${type}">
               <input type="submit" value="${type.replace(type.charAt(0), type.charAt(0).toUpperCase())}">
             </form>
@@ -21,6 +21,6 @@
         }).join('')}
       </div>
     </div>
-    <script src="assets/js/final-frontier.js"></script>
+    <script src="/public/assets/js/final-frontier.js"></script>
   </body>
 </html>
