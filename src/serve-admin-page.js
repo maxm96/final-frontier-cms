@@ -4,7 +4,13 @@
  */
 module.exports = function serveAdminPage(pair) {
   const cardTypes = ['article', 'audio', 'gallery', 'video']
-  const html = pair.templates.render('admin.html', { cardTypes: cardTypes })
+  const html = pair.templates.render(
+    'base.html', 
+    { 
+      title: 'Admin',
+      content: pair.templates.render('admin.html', { cardTypes: cardTypes })
+    }
+  )
   
   pair.res.setHeader('Content-Type', 'text/html')
   pair.res.setHeader('Content-Length', html.length)

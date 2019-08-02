@@ -1,4 +1,5 @@
 const generateCardHtml = require('./generate-card-html')
+const extendTemplate = require('./extend-template')
 
 
 /** @module serveHomePage
@@ -19,6 +20,7 @@ module.exports = function serveHomePage(pair) {
  * @return {Promise} resolves to altered cards array
  */
 function getGalleryImages(pair, cards) {
+  // it's promises all the way down
   return new Promise((resolve, reject) => {
     Promise.all(
       cards.filter(card => card.type === 'gallery').map(gallery => {
@@ -44,9 +46,10 @@ function getGalleryImages(pair, cards) {
 function success(pair, cards) {
   const cardsHtml = generateCardsHtml(cards)
   
-  const html = pair.templates.render(
-    'home.html', 
-    { cardsHtml: cardsHtml }
+  const html = extendTemplate(
+    pair,
+    { template: 'home.html', variables: { cardsHtml: cardsHtml } },
+    { template: 'base.html' }
   )
   
   pair.res.setHeader('Content-Type', 'text/html')
@@ -72,6 +75,7 @@ function failure(pair, err) {
  * @returns {string} the full cards html
  */
 function generateCardsHtml(cards) {
+  // TODO: move this to template engine
   return cards.map(card => {
     return `
       <div class="card ${card.type}">

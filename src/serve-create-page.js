@@ -1,3 +1,6 @@
+const extendTemplate = require('./extend-template')
+
+
 /** @module serveCreatePage
  * Serves the card creation pages.
  * @param {httpPair} pair - the pair object
@@ -6,11 +9,21 @@ module.exports = function serveCreatePage(pair) {
   var cardType = pair.req.body.type
   var formTitle = `Create ${cardType.replace(cardType.charAt(0), cardType.charAt(0).toUpperCase())} Card`
   
-  const html = pair.templates.render('create.html', {
-    cardType: cardType,
-    formTitle: formTitle,
-    fieldSets: generateFieldSets(cardType)
-  })
+  const html = extendTemplate(
+    pair,
+    { 
+      template: 'create.html', 
+      variables: {
+        cardType: cardType,
+        formTitle: formTitle,
+        fieldSets: generateFieldSets(cardType)
+      }
+    },
+    {
+      template: 'base.html',
+      variables: { title: formTitle }
+    }
+  )
   
   pair.res.setHeader('Content-Type', 'text/html')
   pair.res.setHeader('Content-Length', html.length)
