@@ -49,6 +49,8 @@ module.exports = class DataStore {
       this.readGalleryImages = this.readGalleryImages.bind(this)
       this.update = this.update.bind(this)
       this.destroy = this.destroy.bind(this)
+      this.getUser = this.getUser.bind(this)
+      this.saveUser = this.saveUser.bind(this)
     })
   }
   
@@ -199,6 +201,50 @@ module.exports = class DataStore {
         
         resolve(id)
       })
+    })
+  }
+  
+  /** @function getUser
+   * Gets a user by the supplied username.
+   * @param {string} username - the username to search for
+   * @returns {Promise} resolves to the found user object
+   */
+  getUser(username) {
+    return new Promise((resolve, reject) => {
+      if (!username || typeof username !== 'string')
+        reject(new TypeError('The username must be a non-empty string'))
+      
+      this.db.get('SELECT * FROM users WHERE username=?', username, (err, user) => {
+        if (err)
+          reject(err)
+        
+        resolve(user)
+      })
+    })
+  }
+  
+  /** @function saveUser
+   * Saves a new user to the database.
+   * @param {object} user - the user object
+   * @returns {Promise} resolves to the user object
+   */
+  saveUser(user) {
+    return new Promise((resolve, reject) => {
+      if (!user || typeof user !== 'object')
+        reject(new TypeError('Supplied user is invalid'))
+      
+      this.db.run(
+        'INSERT INTO users (username, password) VALUES (?, ?)',
+        user.username,
+        user.password,
+        function (err) {
+          if (err)
+            reject(err)
+          
+          console.log(user)
+          resolve(user)
+        }
+      )
     })
   }
 }

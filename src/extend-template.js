@@ -11,6 +11,11 @@
 module.exports = function extendTemplate(pair, source, destination, keyword = 'content') {
   var destinationOptions = destination.variables || { title: 'Final Frontier' }
   
+  if (pair.session && pair.session.user) 
+    destinationOptions['userInfo'] = `Logged in as ${pair.session.user.username}`
+  else
+    destinationOptions['userInfo'] = 'Guest'
+  
   destinationOptions[keyword] = pair.templates.render(source.template, source.variables || {})
   
   return pair.templates.render(destination.template, destinationOptions)

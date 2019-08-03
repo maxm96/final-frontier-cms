@@ -22,10 +22,16 @@ const serveHomePage = require('./src/serve-home-page')
 const serveAdminPage = require('./src/serve-admin-page')
 const serveCreatePage = require('./src/serve-create-page')
 const createCard = require('./src/create-card')
+const serveSignup = require('./src/serve-signup')
+const serveSignin = require('./src/serve-signin')
+const createUser = require('./src/create-user')
+const createAuthSession = require('./src/create-auth-session')
 
 // set get routes
 router.addRoute('GET', '/', serveHomePage)
 router.addRoute('GET', '/admin', serveAdminPage)
+router.addRoute('GET', '/signup', serveSignup)
+router.addRoute('GET', '/signin', serveSignin)
 router.addRoute('GET', '/public/.+', staticContentServer.serveContent)
 
 // set post routes
@@ -39,6 +45,26 @@ router.addRoute('POST', '/create', pair => {
     .then(createCard)
     .then(serveHomePage)
     .catch(err => console.error(err))
+})
+router.addRoute('POST', '/signup', pair => {
+  wf.bodyParser(pair)
+    .then(wf.memorySession)
+    .then(createUser)
+    .then(serveHomePage)    
+    .catch(err => {
+      console.error(err)
+      serveSignup(pair, err)
+    })
+})
+router.addRoute('POST', '/signin', pair => {
+  wf.bodyParser(pair)
+    .then(wf.memorySession)
+    .then(createAuthSession)
+    .then(serveHomePage)
+    .catch(err => {
+      console.error(err)
+      serveSignin(pair, err)
+    })
 })
 
 // instantiate server

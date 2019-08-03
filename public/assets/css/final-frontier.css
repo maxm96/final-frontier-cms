@@ -216,24 +216,34 @@ h1, h2, h3, h4 {
   text-decoration: none;
 }
 
-/* Create Forms */
-.create-form {
+/* Forms */
+.create-form,
+.signup-form,
+.signin-form {
   text-align: center;
   display: flex;
   flex-direction: column;
 }
 
 .create-form input:not([type="submit"]),
-.create-form textarea {
+.create-form textarea,
+.signup-form input:not([type="submit"]),
+.signup-form textarea,
+.signin-form input:not([type="submit"]),
+.signin-form textarea{
   width: 100%;
   font-size: 16px;
 }
-.create-form fieldset {
+.create-form fieldset,
+.signup-form fieldset,
+.signin-form fieldset {
   border: none;
   width: 500px;
   margin: 0 auto;
 }
-.create-form label {
+.create-form label,
+.signup-form label,
+.signin-form label {
   display: block;
   float: left;
   font-size: 18px;
