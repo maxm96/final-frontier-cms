@@ -26,10 +26,19 @@ const serveSignup = require('./src/serve-signup')
 const serveSignin = require('./src/serve-signin')
 const createUser = require('./src/create-user')
 const createAuthSession = require('./src/create-auth-session')
+const requireAuth = require('./src/require-auth')
 
 // set get routes
-router.addRoute('GET', '/', serveHomePage)
-router.addRoute('GET', '/admin', serveAdminPage)
+router.addRoute('GET', '/', pair => {
+  wf.memorySession(pair)
+    .then(serveHomePage)
+})
+router.addRoute('GET', '/admin', pair => {
+  wf.memorySession(pair)
+    .then(requireAuth)
+    .then(serveAdminPage)
+    .catch(pair => serveSignin(pair, 'You must sign in before you can submit content.'))
+})
 router.addRoute('GET', '/signup', serveSignup)
 router.addRoute('GET', '/signin', serveSignin)
 router.addRoute('GET', '/public/.+', staticContentServer.serveContent)
@@ -37,11 +46,13 @@ router.addRoute('GET', '/public/.+', staticContentServer.serveContent)
 // set post routes
 router.addRoute('POST', '/create-page', pair => {
   wf.bodyParser(pair)
+    .then(wf.memorySession)
     .then(serveCreatePage)
     .catch(err => console.error(err))
 })
 router.addRoute('POST', '/create', pair => {
   wf.bodyParser(pair)
+    .then(wf.memorySession)
     .then(createCard)
     .then(serveHomePage)
     .catch(err => console.error(err))

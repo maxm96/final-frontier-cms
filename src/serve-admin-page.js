@@ -1,15 +1,16 @@
+const extendTemplate = require('./extend-template')
+
+
 /** @module serveAdminPage
  * Serves the admin page.
  * @param {httpPair} pair - the pair object
  */
 module.exports = function serveAdminPage(pair) {
   const cardTypes = ['article', 'audio', 'gallery', 'video']
-  const html = pair.templates.render(
-    'base.html', 
-    { 
-      title: 'Admin',
-      content: pair.templates.render('admin.html', { cardTypes: cardTypes })
-    }
+  const html = extendTemplate(
+    pair,
+    { template: 'admin.html', variables: { cardTypes: cardTypes } },
+    { template: 'base.html', variables: { title: 'Admin' } }
   )
   
   pair.res.setHeader('Content-Type', 'text/html')
